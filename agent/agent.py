@@ -78,40 +78,41 @@ class ValueIterationAgent(object):
             value_policy (shape - (|S|)): utility value for each state
             policy_function (shape - (|S|), dtype = int64): action policy per state
         '''
-        value_policy = np.zeros(len(self.env.disc_states))
-        policy_function = np.zeros(len(self.env.disc_states))
+        values = np.zeros(len(self.disc_states))
+        policy = np.zeros(len(self.disc_states))
 
         for iteration in range(self.max_iterations):
-            old_value_policy = np.copy(value_policy)
+            old_values = np.copy(values)
             delta = 0
 
-            for s in range(len(self.env.disc_states)):
-                Q = {}
-                for a in range(len(self.env.disc_actions)):
-                    result_state = self.Prob[s][a][0][1]
-                    Q[a] = self.Prob[s][a][0][2] + self.gamma * old_value_policy[result_state]
+            for state in range(len(self.disc_states)):
+                q_values = np.zeros(len(self.disc_actions))
 
-                value_policy[s] = max(Q.values())
-                policy_function[s] = max(Q, key=Q.get)
+                for action in range(len(self.disc_actions)):
+                    trans = self.Prob[state][action]
+                    prob = trans[0][0]
+                    next_state = trans[0][1]
+                    info = trans[0][2]
 
-                if abs(value_policy[s] - old_value_policy[s]) > delta:
-                    delta = abs(value_policy[s] - old_value_policy[s])
-                
-            if (delta < self.theta * (1 - self.gamma) / self.gamma):
+                    q_values[action] = prob * (info + self.gamma * old_values[next_state])
+
+                max_q_value = max(q_values)
+
+                max_action = np.argmax(q_values)
+
+                values[state] = max_q_value
+                policy[state] = max_action
+
+                delta = max(abs(values[state] - old_values[state]), delta)
+
+            if delta <= self.theta * ((1 - self.gamma)/ self.gamma):
                 break
-
-            # DEBUGGING
-            if (iteration % 20 == 0):
-                print("At iteration ", iteration, ", delta ", delta)
-        
-        policy_function = policy_function.astype(int)
-        np.savetxt("policy_function.txt", policy_function, fmt="%d")
-
-        # the following is random policy provided for testing purpose only
-        # your proposed solution must be better than random
 
         # value_policy = np.random.choice(len(self.env.disc_actions), size=len(self.env.disc_states))
         # policy_function = np.random.choice(len(self.env.disc_actions), size=len(self.env.disc_states))
+
+        value_policy = values
+        policy_function = policy
 
         return value_policy, policy_function
 
