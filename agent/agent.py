@@ -1,4 +1,5 @@
-
+# A0192340M Saravanan Yukesh Ragavendar
+# A0217367Y Hester James Douglas
 import numpy as np
 # from elevator import ElevatorEnv
 from pyRDDLGym.Policies.Agents import RandomAgent
@@ -78,6 +79,10 @@ class ValueIterationAgent(object):
             value_policy (shape - (|S|)): utility value for each state
             policy_function (shape - (|S|), dtype = int64): action policy per state
         '''
+
+        # the following is random policy provided for testing purpose only
+        # your proposed solution must be better than random
+
         values = np.zeros(len(self.disc_states))
         policy = np.zeros(len(self.disc_states))
 
