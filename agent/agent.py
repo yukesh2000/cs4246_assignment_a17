@@ -80,20 +80,21 @@ class ValueIterationAgent(object):
             policy_function (shape - (|S|), dtype = int64): action policy per state
         '''
 
-        # the following is random policy provided for testing purpose only
-        # your proposed solution must be better than random
+        state_len = len(self.disc_states)
+        action_len = len(self.disc_actions)
 
-        values = np.zeros(len(self.disc_states))
-        policy = np.zeros(len(self.disc_states))
+        values = np.zeros(state_len)
+        policy = np.zeros(state_len)
 
         for iteration in range(self.max_iterations):
+
             old_values = np.copy(values)
             delta = 0
 
-            for state in range(len(self.disc_states)):
-                q_values = np.zeros(len(self.disc_actions))
+            for state in range(state_len):
+                q_values = np.zeros(action_len)
 
-                for action in range(len(self.disc_actions)):
+                for action in range(action_len):
                     trans = self.Prob[state][action]
                     prob = trans[0][0]
                     next_state = trans[0][1]
@@ -102,7 +103,6 @@ class ValueIterationAgent(object):
                     q_values[action] = prob * (info + self.gamma * old_values[next_state])
 
                 max_q_value = max(q_values)
-
                 max_action = np.argmax(q_values)
 
                 values[state] = max_q_value
@@ -110,14 +110,11 @@ class ValueIterationAgent(object):
 
                 delta = max(abs(values[state] - old_values[state]), delta)
 
-            if delta <= self.theta * ((1 - self.gamma)/ self.gamma):
+            if delta <= self.theta:
                 break
 
-        # value_policy = np.random.choice(len(self.env.disc_actions), size=len(self.env.disc_states))
-        # policy_function = np.random.choice(len(self.env.disc_actions), size=len(self.env.disc_states))
-
         value_policy = values
-        policy_function = policy
+        policy_function = policy.astype(int)
 
         return value_policy, policy_function
 
