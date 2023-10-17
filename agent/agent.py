@@ -23,7 +23,7 @@ class ElevatorAgentEnv(AgentEnv):
             self.base_env.reward_range,
             uid=0,
             port=port,
-            #env=self.base_env,
+            env=self.base_env,
         )  # uid can be any int for single-agent agent env
 
     def create_agent(self, **kwargs):
@@ -122,7 +122,7 @@ def main():
     # Regarding rendering: we save each step as png and convert to png under the hood. 
     # Set is_render=True to do so or your local testing
     # before submitting, always set is_render to False.
-    is_render = True
+    is_render = False
     render_path = 'temp_vis'
     env = Elevator(is_render=is_render, render_path=render_path)
 
@@ -131,8 +131,7 @@ def main():
     state = env.reset()
 
     total_reward = 0
-    for t in range(1):
-    #for t in range(env.horizon):
+    for t in range(env.horizon):
         action = agent.step(state)
         next_state, reward, terminated, info = env.step(action)  # self.env.step(action)
 
