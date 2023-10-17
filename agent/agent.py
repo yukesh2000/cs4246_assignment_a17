@@ -93,7 +93,7 @@ def main():
     # Regarding rendering: we save each step as png and convert to png under the hood. 
     # Set is_render=True to do so or your local testing
     # before submitting, always set is_render to False.
-    is_render = False
+    is_render = True
     render_path = 'temp_vis'
     env = Elevator(is_render=is_render, render_path=render_path)
 
