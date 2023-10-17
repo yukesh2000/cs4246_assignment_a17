@@ -78,6 +78,26 @@ class ValueIterationAgent(object):
             value_policy (shape - (|S|)): utility value for each state
             policy_function (shape - (|S|), dtype = int64): action policy per state
         '''
+        value_policy = np.zeros(len(self.env.disc_states))
+
+        for iteration in range(self.max_iterations):
+            old_value_policy = np.copy(value_policy)
+            delta = 0
+
+            for s in range(len(self.env.disc_states)):
+                Q = {}
+                for a in range(len(self.env.disc_actions)):
+                    result_state = self.Prob[s][a][1]
+                    Q[a] = self.Prob[s][a][2] + self.gamma * old_value_policy[result_state]
+
+                value_policy[s] = max(Q.values())
+                policy_function[s] = max(Q, key=Q.get)
+
+                if abs(value_policy[s] - old_value_policy[s]) > delta:
+                    delta = abs(value_policy[s] - old_value_policy[s])
+                
+            if (delta < self.theta * (1 - self.gamma) / self.gamma):
+                break
 
         # the following is random policy provided for testing purpose only
         # your proposed solution must be better than random
