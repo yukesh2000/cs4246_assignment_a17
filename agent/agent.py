@@ -23,7 +23,7 @@ class ElevatorAgentEnv(AgentEnv):
             self.base_env.reward_range,
             uid=0,
             port=port,
-            env=self.base_env,
+            #env=self.base_env,
         )  # uid can be any int for single-agent agent env
 
     def create_agent(self, **kwargs):
@@ -88,8 +88,8 @@ class ValueIterationAgent(object):
             for s in range(len(self.env.disc_states)):
                 Q = {}
                 for a in range(len(self.env.disc_actions)):
-                    result_state = self.Prob[s][a][1]
-                    Q[a] = self.Prob[s][a][2] + self.gamma * old_value_policy[result_state]
+                    result_state = self.Prob[s][a][0][1]
+                    Q[a] = self.Prob[s][a][0][2] + self.gamma * old_value_policy[result_state]
 
                 value_policy[s] = max(Q.values())
                 policy_function[s] = max(Q, key=Q.get)
@@ -99,13 +99,19 @@ class ValueIterationAgent(object):
                 
             if (delta < self.theta * (1 - self.gamma) / self.gamma):
                 break
+
+            # DEBUGGING
+            if (iteration % 20 == 0):
+                print("At iteration ", iteration, ", delta ", delta)
         
         policy_function = policy_function.astype(int)
+        np.savetxt("policy_function.txt", policy_function, fmt="%d")
+
         # the following is random policy provided for testing purpose only
         # your proposed solution must be better than random
 
-        value_policy = np.random.choice(len(self.env.disc_actions), size=len(self.env.disc_states))
-        policy_function = np.random.choice(len(self.env.disc_actions), size=len(self.env.disc_states))
+        # value_policy = np.random.choice(len(self.env.disc_actions), size=len(self.env.disc_states))
+        # policy_function = np.random.choice(len(self.env.disc_actions), size=len(self.env.disc_states))
 
         return value_policy, policy_function
 
@@ -124,7 +130,8 @@ def main():
     state = env.reset()
 
     total_reward = 0
-    for t in range(env.horizon):
+    for t in range(1):
+    #for t in range(env.horizon):
         action = agent.step(state)
         next_state, reward, terminated, info = env.step(action)  # self.env.step(action)
 
