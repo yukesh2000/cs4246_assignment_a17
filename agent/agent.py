@@ -79,6 +79,7 @@ class ValueIterationAgent(object):
             policy_function (shape - (|S|), dtype = int64): action policy per state
         '''
         value_policy = np.zeros(len(self.env.disc_states))
+        policy_function = np.zeros(len(self.env.disc_states))
 
         for iteration in range(self.max_iterations):
             old_value_policy = np.copy(value_policy)
@@ -98,7 +99,8 @@ class ValueIterationAgent(object):
                 
             if (delta < self.theta * (1 - self.gamma) / self.gamma):
                 break
-
+        
+        policy_function = policy_function.astype(int)
         # the following is random policy provided for testing purpose only
         # your proposed solution must be better than random
 
